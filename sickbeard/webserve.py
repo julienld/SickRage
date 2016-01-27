@@ -2619,7 +2619,7 @@ class HomeAddShows(Home):
                         popular_shows=popular_shows, imdb_exception=e,
                         topmenu="home",
                         controller="addShows", action="popularShows")
-        
+
     def anidbPopular(self):
         """
         Fetches data from IMDB to show a list of popular shows.
@@ -2635,7 +2635,7 @@ class HomeAddShows(Home):
             mapped_anime = None
 
         return t.render(title="Anidb Popular Anime", header="Anidb Popular Anime",
-                        anime=mapped_anime, imdb_exception=e, whitelist=[], 
+                        anime=mapped_anime, imdb_exception=e, whitelist=[],
                         blacklist=[], groups=[], topmenu="home", enable_anime_options=True,
                         controller="addShows", action="addFromList")
 
@@ -2678,10 +2678,10 @@ class HomeAddShows(Home):
 
         if Show.find(sickbeard.showList, int(indexer_id)):
             return
-        
+
         # Sanitize the paramater anyQualities and bestQualities. As these would normally be passed as lists
         if any_qualities:
-            any_qualities = any_qualities.split(',')  
+            any_qualities = any_qualities.split(',')
         else:
             any_qualities = []
 
@@ -2689,22 +2689,22 @@ class HomeAddShows(Home):
             best_qualities = best_qualities.split(',')
         else:
             best_qualities = []
-        
+
         # If configure_show_options is enabled let's use the provided settings
         configure_show_options = config.checkbox_to_value(configure_show_options)
-        
+
         if configure_show_options:
             # prepare the inputs for passing along
             scene = config.checkbox_to_value(scene)
             anime = config.checkbox_to_value(anime)
             flatten_folders = config.checkbox_to_value(flatten_folders)
             subtitles = config.checkbox_to_value(subtitles)
-            
+
             if whitelist:
                 whitelist = short_group_names(whitelist)
             if blacklist:
                 blacklist = short_group_names(blacklist)
-                
+
             if not any_qualities:
                 any_qualities = []
             if not best_qualities or try_int(quality_preset, None):
@@ -2714,9 +2714,9 @@ class HomeAddShows(Home):
             if not isinstance(best_qualities, list):
                 bestQualities = [best_qualities]
             quality = Quality.combineQualities([int(q) for q in any_qualities], [int(q) for q in best_qualities])
-    
+
             location = root_dir
-                
+
         else:
             default_status=sickbeard.STATUS_DEFAULT
             quality=sickbeard.QUALITY_DEFAULT
@@ -2725,8 +2725,8 @@ class HomeAddShows(Home):
             anime=sickbeard.ANIME_DEFAULT
             scene=sickbeard.SCENE_DEFAULT
             default_status_after=sickbeard.STATUS_DEFAULT_AFTER
-            
-            
+
+
             if sickbeard.ROOT_DIRS:
                 root_dirs = sickbeard.ROOT_DIRS.split('|')
                 location = root_dirs[int(root_dirs[0]) + 1]
@@ -2739,12 +2739,12 @@ class HomeAddShows(Home):
 
         show_name = get_showname_from_indexer(1, indexer_id)
         show_dir = None
-        
+
         # add the show
-        sickbeard.showQueueScheduler.action.addShow(1, int(indexer_id), show_dir, int(default_status), quality, flatten_folders, 
-                                                    indexer_lang, subtitles, anime, scene, None, blacklist, whitelist, 
+        sickbeard.showQueueScheduler.action.addShow(1, int(indexer_id), show_dir, int(default_status), quality, flatten_folders,
+                                                    indexer_lang, subtitles, anime, scene, None, blacklist, whitelist,
                                                     int(default_status_after), root_dir=location)
-        
+
         ui.notifications.message('Show added', 'Adding the specified show {0}'.format(show_name))
 
         # done adding show
@@ -3998,9 +3998,13 @@ class ConfigBackupRestore(Config):
         finalResult = ''
 
         if backupDir:
-            source = [ek(os.path.join, sickbeard.DATA_DIR, 'sickbeard.db'), sickbeard.CONFIG_FILE,
-                      ek(os.path.join, sickbeard.DATA_DIR, 'failed.db'),
-                      ek(os.path.join, sickbeard.DATA_DIR, 'cache.db')]
+            source = [
+                sickbeard.CONFIG_FILE,
+                sickbeard.db.dbFilename(),
+                sickbeard.db.dbFilename('failed.db'),
+                sickbeard.db.dbFilename('cache.db')
+            ]
+
             target = ek(os.path.join, backupDir, 'sickrage-' + time.strftime('%Y%m%d%H%M%S') + '.zip')
 
             for (path, dirs, files) in ek(os.walk, sickbeard.CACHE_DIR, topdown=True):
